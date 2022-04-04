@@ -18,7 +18,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head> 
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- Primary Meta Tags -->
 <title>Парсер</title>
@@ -66,7 +66,6 @@
 </head>
 
 <body>
-
         <!-- NOTICE: You can use the _analytics.html partial to include production code specific code & trackers -->
         
 
@@ -447,7 +446,7 @@
                     <div class="col ps-0 ms-2">
                       <div class="d-flex justify-content-between align-items-center">
                           <div>
-                            <h4 class="h6 mb-0 text-small">Bonnie Green</h4>
+                            <h4 class="h6 mb-0 text-small">{{ name }}</h4>
                           </div>
                           <div class="text-end">
                             <small>2 hrs ago</small>
@@ -469,7 +468,7 @@
             <div class="media d-flex align-items-center">
               <img class="avatar rounded-circle" alt="Image placeholder" src="{{ url_for('static', filename='assets/img/team/profile-picture-3.jpg') }}">
               <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                <span class="mb-0 font-small fw-bold text-gray-900">Bonnie Green</span>
+                <span class="mb-0 font-small fw-bold text-gray-900">{{ name }}</span>
               </div>
             </div>
           </a>
@@ -512,7 +511,7 @@
 <!-- Button Modal -->
 <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalSignIn">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        Начать поиск
+                        Начать парсинг
 </button>
 
 <!-- Modal Content -->
@@ -545,360 +544,132 @@
     </div>
 </div>
 <!-- End of Modal Content -->
-
-
+<script src="https://cdn.socket.io/4.4.0/socket.io.min.js" integrity="sha384-1fOn6VtTq3PWwfsOrk45LnYcGosJwzMHv+Xh/Jx5303FVOXzEnw0EpLv30mtjmlj" crossorigin="anonymous"></script>
+                  <script src="{{ url_for('static', filename='js/socketio.js') }}"></script>
 
                 </div>
             </div>
 
             <div class="card card-body border-0 shadow table-wrapper table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover" id="tabled">
                     <thead>
                         <tr>
-                            <th class="border-gray-200">#</th>
-                            <th class="border-gray-200">Bill For</th>						
-                            <th class="border-gray-200">Issue Date</th>
-                            <th class="border-gray-200">Due Date</th>
-                            <th class="border-gray-200">Total</th>
-                            <th class="border-gray-200">Status</th>
-                            <th class="border-gray-200">Action</th>
+                            <th class="border-gray-200">ID</th>
+                            <th class="border-gray-200">Название</th>
+                            <th class="border-gray-200">Access Hash</th>
+                            <th class="border-gray-200">Username</th>
+                            <th class="border-gray-200">Участников</th>
+                            <th class="border-gray-200">Действие</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Item -->
+                    {% for row in data %}
                         <tr>
                             <td>
-                                <a href="#" class="fw-bold">
-                                    456478
+                                <a class="fw-bold">
+                                    {{ row[0] }}
                                 </a>
                             </td>
                             <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
+                                <span>{{ row[1] }}</span>
                             </td>
-                            <td><span class="fw-normal">1 May 2020</span></td>                        
-                            <td><span class="fw-normal">1 Jun 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-warning">Due</span></td>
+                            <td><span class="fw-normal">{{ row[2] }}</span></td>
                             <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
+                                <a href="https://t.me/{{ row[3] }}" target="_blank" class="fw-bold">
+                                    {{ row[3] }}
+                                </a>
+                            </td>
+                            <td><span class="fw-bold">{{ row[4] }}</span></td>
+                            <td>
+                                <div class="dropdown me-1">
+                                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenuOffset" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="-10,-40">
+                                        Действие
+                                        </button>
+                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenuOffset">
+                                            <li>
+                                              <iframe name="dummyframe3" id="dummyframe3" style="display: none;"></iframe>
+                                              <form action="/parse" target="dummyframe3" id="parseform" method="post">
+                                              <input value="{{ row[0] }}" hidden name="id" />
+                                              <button class="dropdown-item rounded-top">Спарсить участников</button>
+
+                                              </form>
+                                            </li>
+                                            <li><button data-bs-toggle="modal" data-bs-target="#deleteModal" data-val="{{ row[0] }}" data-desc="{{ row[1] }}" class="dropdown-item rounded-bottom">Удалить</button></li>
+                                        </ul>
                                     </div>
-                                </div>
                             </td>
                         </tr>
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456423
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Apr 2020</span></td>                        
-                            <td><span class="fw-normal">1 May 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456420
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Mar 2020</span></td>                        
-                            <td><span class="fw-normal">1 Apr 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456421
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Feb 2020</span></td>                        
-                            <td><span class="fw-normal">1 Mar 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456420
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Jan 2020</span></td>                        
-                            <td><span class="fw-normal">1 Feb 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456479
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Dec 2019</span></td>                        
-                            <td><span class="fw-normal">1 Jan 2020</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456478
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Platinum Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Nov 2019</span></td>                        
-                            <td><span class="fw-normal">1 Dec 2019</span></td>
-                            <td><span class="fw-bold">$799,00</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr> 
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    453673
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Gold Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Oct 2019</span></td>                        
-                            <td><span class="fw-normal">1 Nov 2019</span></td>
-                            <td><span class="fw-bold">$533,42</span></td>
-                            <td><span class="fw-bold text-danger">Cancelled</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456468
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Gold Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Sep 2019</span></td>                        
-                            <td><span class="fw-normal">1 Oct 2019</span></td>
-                            <td><span class="fw-bold">$533,42</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>    
-                        <!-- Item -->
-                        <tr>
-                            <td>
-                                <a href="#" class="fw-bold">
-                                    456478
-                                </a>
-                            </td>
-                            <td>
-                                <span class="fw-normal">Flexible Subscription Plan</span>
-                            </td>
-                            <td><span class="fw-normal">1 Aug 2019</span></td>                        
-                            <td><span class="fw-normal">1 Sep 2019</span></td>
-                            <td><span class="fw-bold">$233,42</span></td>
-                            <td><span class="fw-bold text-success">Paid</span></td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span class="icon icon-sm">
-                                            <span class="fas fa-ellipsis-h icon-dark"></span>
-                                        </span>
-                                        <span class="visually-hidden">Toggle Dropdown</span>
-                                    </button>
-                                    <div class="dropdown-menu py-0">
-                                        <a class="dropdown-item rounded-top" href="#"><span class="fas fa-eye me-2"></span>View Details</a>
-                                        <a class="dropdown-item" href="#"><span class="fas fa-edit me-2"></span>Edit</a>
-                                        <a class="dropdown-item text-danger rounded-bottom" href="#"><span class="fas fa-trash-alt me-2"></span>Remove</a>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>                                
+                    {% endfor %}
                     </tbody>
                 </table>
-                <div class="card-footer px-3 border-0 d-flex flex-column flex-lg-row align-items-center justify-content-between">
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination mb-0">
-                            <li class="page-item">
-                                <a class="page-link" href="#">Previous</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">1</a>
-                            </li>
-                            <li class="page-item active">
-                                <a class="page-link" href="#">2</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">3</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">4</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">5</a>
-                            </li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-<!--                    <div class="fw-normal small mt-4 mt-lg-0">Showing <b>5</b> out of <b>25</b> entries</div>-->
+                {% if data|length == 0 %}
+                <div id="norec">
+                <br>
+                <br>
+                <h2 class="h6" style="text-align: center;">Нет записей.</h2>
+                <br>
+                <br>
                 </div>
+                {% endif %}
+
             </div>
 
 </div>
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="h6 modal-title">Удалить запись из базы?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                      <div class="modal-body">
+                        <h4></h4>
+
+</div>
+            <div class="modal-footer">
+              <iframe name="dummyframe2" id="dummyframe2" style="display: none;"></iframe>
+              <form id="deleteform" action="delete_record" target="dummyframe2" method="post">
+                <input id="delet" name="delet" />
+                <button type="submit" id="delete_parsed" class="btn btn-danger">Удалить</button>
+              </form>
+                <button type="button" class="btn btn-link text-gray ms-auto" data-bs-dismiss="modal">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+          <script>
+$(document).ready(function(){
+
+  $('#deleteform').on('submit', function (event) {
+  var val = document.getElementById("delet").value
+  $('#deleteModal').modal('hide')
+  var notyfDemo = new Notyf();
+  notyfDemo.success('Удалено')
+  var aTags = document.getElementsByTagName("a");
+  for (var i = 0; i < aTags.length; i++) {
+  if (aTags[i].textContent.includes(val)) {
+    var ddel = aTags[i].closest("tr")
+    ddel.parentElement.removeChild(ddel)
+  }
+}
+  })
+
+  $('#deleteModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget)
+  var value = button.data('val')
+  var desc = button.data('desc')
+
+  var modal = $(this)
+  modal.find('.modal-footer input').val(value)
+  modal.find('.modal-body h4').text(desc)
+  modal.find('.modal-footer input').hide()
+
+})
+})
+          </script>
+
 
 <div class="card theme-settings bg-gray-800 theme-settings-expand" id="theme-settings-expand">
     <div class="card-body bg-gray-800 text-white rounded-top p-3 py-2">
@@ -920,13 +691,27 @@
         </main>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script>
+        document.getElementById('parseform').addEventListener('submit', function () {
+        Swal.fire({
+        icon: 'success',
+        title: 'Готово!',
+        text: 'Парсинг может занять некоторое время',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
+    })
+        });
             document.getElementById('searchform').addEventListener('submit', function () {
-            $('#modalSignIn').modal('hide');
+
     Swal.fire({
         icon: 'success',
         title: 'Готово!',
-        text: 'Парсинг может занять некоторое время'
+        text: 'Парсинг может занять некоторое время',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true
     })
+    $('#modalSignIn').modal('hide');
 });
         </script>
     <!-- Core -->
@@ -936,8 +721,6 @@
 <!-- Vendor JS -->
 <script src="{{ url_for('static', filename='vendor/onscreen/dist/on-screen.umd.min.js') }}"></script>
 
-<!-- Slider -->
-<script src="{{ url_for('static', filename='vendor/nouislider/distribute/nouislider.min.js') }}"></script>
 
 <!-- Smooth scroll -->
 <script src="{{ url_for('static', filename='vendor/smooth-scroll/dist/smooth-scroll.polyfills.min.js') }}"></script>
