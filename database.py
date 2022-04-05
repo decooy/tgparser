@@ -66,3 +66,11 @@ class database:
     def get_chats_count(self):
         self.cursor.execute(F"""SELECT count(*) FROM parsed_chats;""")
         return self.cursor.fetchone()[0]
+
+    def get_all_accounts(self):
+        self.cursor.execute(f"""SELECT * FROM users""")
+        return self.cursor.fetchall()
+
+    def delete_user(self, id):
+        self.cursor.execute(f"""DELETE FROM users WHERE id='{id}'""")
+        self.postgre_connection.commit()

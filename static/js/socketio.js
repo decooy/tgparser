@@ -40,6 +40,20 @@ var elem = document.getElementById('swal2-html-container')
 elem.innerHTML = 'Чатов найдено: ' + msg.count;
 });
 
+socket.on('total_chats', function(msg) {
+var elem = document.getElementById('chatcount')
+var elem2 = document.getElementById('chatcount2')
+elem.innerHTML = msg.count;
+elem2.innerHTML = msg.count;
+});
+
+socket.on('total_users', function(msg) {
+var elem = document.getElementById('usercount')
+var elem2 = document.getElementById('usercount2')
+elem.innerHTML = msg.count;
+elem2.innerHTML = msg.count;
+});
+
 socket.on('show_message', function(msg) {
 try {
 Swal.fire({
@@ -53,3 +67,21 @@ var a = ''
 }
 
 })
+
+socket.on('updateprogresstext', function(msg) {
+                    $('#progresstext').html(msg.text);
+            });
+
+socket.on('sendnotyferror', function(msg) {
+var notyfDemo = new Notyf();
+                    notyfDemo.error(msg.text)
+            });
+socket.on('sendnotyfsuccess', function(msg) {
+var notyfDemo = new Notyf();
+                    notyfDemo.success(msg.text)
+            });
+
+socket.on('updateprogress', function(msg) {
+                    $('#progre').css('width', msg.percent + '%');
+                    $('#progresspercent').html(msg.sended + '/' + msg.total);
+            });
