@@ -18,10 +18,38 @@ socket.on('parsed_chat', function(msg) {
             '</div>' +
             '</td>'
             + '</tr>');
-            $(norec).hide()
+            try {
+                        $(norec).hide()
+            } catch (e) {
+            var a = e;
+            }
 });
+
+socket.on('found_users', function(msg) {
+try {
+var elem = document.getElementById('swal2-html-container')
+elem.innerHTML = 'Пользователей сохранено: ' + msg.count;
+} catch {
+var a = '';
+}
+
+})
 
 socket.on('found_chats', function(msg) {
 var elem = document.getElementById('swal2-html-container')
 elem.innerHTML = 'Чатов найдено: ' + msg.count;
 });
+
+socket.on('show_message', function(msg) {
+try {
+Swal.fire({
+          icon: msg.status,
+          title: msg.title,
+          text: msg.text,
+          showConfirmButton: false
+          })
+} catch {
+var a = ''
+}
+
+})

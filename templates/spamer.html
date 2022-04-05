@@ -21,7 +21,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- Primary Meta Tags -->
-<title>Парсер</title>
+<title>Спамер</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="title" content="Volt Free Bootstrap Dashboard - Transactions">
 <meta name="author" content="Themesberg">
@@ -104,7 +104,7 @@
       </div>
     </div>
     <ul class="nav flex-column pt-3 pt-md-0">
-      <li class="nav-item  active ">
+      <li class="nav-item">
         <a href="/" class="nav-link">
           <span class="sidebar-icon">
           <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -112,7 +112,7 @@
           <span class="sidebar-text">Парсер</span>
         </a>
       </li>
-      <li class="nav-item">
+      <li class="nav-item active">
         <a href="/spamer" class="nav-link">
           <span class="sidebar-icon">
             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
@@ -175,7 +175,7 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 <div class="d-block mb-4 mb-md-0">
 
-                    <h2 class="h4">Парсер чатов</h2>
+                    <h2 class="h4">Спамер</h2>
 <!--                    <p class="mb-0">Your web analytics dashboard template.</p>-->
                 </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
@@ -193,7 +193,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body px-md-5">
-                <h2 class="h4 text-center">Парсер телеграм чатов</h2>
+                <h2 class="h4 text-center">Спамер телеграм чатов</h2>
                 <p class="text-center mb-4">Введите ключевое слово для поиска</p>
                 <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
                 <form action="/search" target="dummyframe" id="searchform" method="post">
@@ -221,82 +221,118 @@
                 </div>
             </div>
 
-            <div class="card card-body border-0 shadow table-wrapper table-responsive">
-                <table class="table table-hover" id="tabled">
-                    <thead>
-                        <tr>
-                            <th class="border-gray-200">ID</th>
-                            <th class="border-gray-200">Название</th>
-                            <th class="border-gray-200">Access Hash</th>
-                            <th class="border-gray-200">Username</th>
-                            <th class="border-gray-200">Участников</th>
-                            <th class="border-gray-200">Действие</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for row in data %}
-                        <tr>
-                            <td>
-                                <a class="fw-bold">
-                                    {{ row[0] }}
-                                </a>
-                            </td>
-                            <td>
-                                <span>
-                                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
-                                    {{ row[1] }}</span>
-                            </td>
-                            <td><span class="fw-normal">{{ row[2] }}</span></td>
-                            <td>
-                                <a href="https://t.me/{{ row[3] }}" target="_blank" class="fw-bold">
-                                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                                    {{ row[3] }}
-                                </a>
-                            </td>
-                            <td><span class="fw-bold">
-                                                                    <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="row">
+                <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body">
+                            <div class="row d-block d-xl-flex align-items-center">
+                                <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                    <div class="icon-shape icon-shape-primary rounded me-4 me-sm-0">
+                                        <svg class="icon icon-md" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z">
 
-                                {{ row[4] }}
-                            </span></td>
-                            <td>
-                                <div class="dropdown me-1">
-                                        <button type="button" class="btn btn-secondary dropdown-toggle" id="dropdownMenuOffset" data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="-10,-40">
-                                        Действие
-                                        </button>
-                                        <ul class="dropdown-menu py-0" aria-labelledby="dropdownMenuOffset">
-                                            <li>
-                                              <iframe name="dummyframe3" id="dummyframe3" style="display: none;"></iframe>
-                                              <form action="/parse" target="dummyframe3" id="parseform" method="post">
-                                              <input value="{{ row[0] }}" hidden name="id" />
-                                              <button class="dropdown-item rounded-top">
-                                                  <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
-                                                  Спарсить участников</button>
-
-                                              </form>
-                                            </li>
-                                            <li><button data-bs-toggle="modal" data-bs-target="#deleteModal" data-val="{{ row[0] }}" data-desc="{{ row[1] }}" class="dropdown-item rounded-bottom" autofocus>
-                                                <svg class="icon icon-xs me-2" fill="none" stroke="red" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                Удалить</button></li>
-                                        </ul>
+                                            </path>
+                                        </svg>
                                     </div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% if data|length == 0 %}
-                <div id="norec">
-                <br>
-                <br>
-                <h2 class="h6" style="text-align: center;">Нет записей.</h2>
-                <br>
-                <br>
+                                    <div class="d-sm-none">
+                                        <h2 class="h5">
+                                            Пользователей в базе
+                                        </h2>
+                                        <h3 class="fw-extrabold mb-1">
+                                            {{ count }}
+
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-7 px-xl-0">
+                                    <div class="d-none d-sm-block">
+                                        <h2 class="h5">
+                                            Пользователей в базе
+                                        </h2>
+                                        <h3 class="fw-extrabold mb-1">
+                                            {{ count }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
+                <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body">
+                            <div class="row d-block d-xl-flex align-items-center">
+                                <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                    <div class="icon-shape icon-shape-primary rounded me-4 me-sm-0">
+                                        <svg class="icon icon-md" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
 
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="d-sm-none">
+                                        <h2 class="h5">
+                                            Чатов в базе
+
+                                        </h2>
+                                        <h3 class="fw-extrabold mb-1">
+                                            {{ chatcount }}
+
+                                        </h3>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-7 px-xl-0">
+                                    <div class="d-none d-sm-block">
+                                        <h2 class="h5">
+                                            Чатов в базе
+                                        </h2>
+                                        <h3 class="fw-extrabold mb-1">
+                                            {{ chatcount }}
+                                        </h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                    <div class="card border-0 shadow">
+                        <div class="card-body">
+                            <div class="row d-block d-xl-flex align-items-center">
+                                <div class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                    <div class="icon-shape icon-shape-primary rounded me-4 me-sm-0">
+                                        <svg class="w-6 h-6" fill="currentColor" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                    </div>
+                                    <div class="d-sm-none">
+                                        <h2 class="h5">
+                                            Аккаунт
+                                        </h2>
+                                        <h6 class="fw-extrabold mb-1">
+                                            {{ me[0] }}<span></span>
+                                            {{ me[1] }}
+                                            <br />
+                                            {{ me[2] }}
+                                        </h6 class="fw-extrabold mb-1">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-xl-7 px-xl-0">
+                                    <div class="d-none d-sm-block">
+                                        <h2 class="h5">
+                                            Аккаунт
+                                        </h2>
+                                        <h6 class="fw-extrabold mb-1">
+                                            {{ me[0] }}<span></span>
+                                            {{ me[1] }}
+                                            <br />
+                                            {{ me[2] }}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-
-</div>
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="modal-default" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">

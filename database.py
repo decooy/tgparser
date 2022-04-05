@@ -29,6 +29,13 @@ class database:
                         """)
         self.postgre_connection.commit()
 
+        self.cursor.execute("""CREATE TABLE IF NOT EXISTS account(
+                                   first_name TEXT,
+                                   number TEXT
+                                   );
+                                """)
+        self.postgre_connection.commit()
+
     def add_parsed_chat(self, id, title, access_hash, username, participants_count):
         self.cursor.execute(f"""INSERT INTO parsed_chats(id, title, access_hash, username, participants_count) 
         VALUES('{id}', '{title}', '{access_hash}', '{username}', {participants_count})""")
@@ -51,3 +58,11 @@ class database:
         '{user.id}', '{user.access_hash}', '{str(user.first_name).replace("'", "")}',
          '{str(user.last_name).replace("'", "")}', '{user.username}', '{user.phone}', '{chat[0]}')""")
         self.postgre_connection.commit()
+
+    def get_accounts_count(self):
+        self.cursor.execute(F"""SELECT count(*) FROM users;""")
+        return self.cursor.fetchone()[0]
+
+    def get_chats_count(self):
+        self.cursor.execute(F"""SELECT count(*) FROM parsed_chats;""")
+        return self.cursor.fetchone()[0]
