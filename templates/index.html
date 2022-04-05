@@ -136,41 +136,7 @@
     
         <main class="content">
 
-            <nav class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark ps-0 pe-2 pb-0">
-  <div class="container-fluid px-0">
-    <div class="d-flex justify-content-between w-100" id="navbarSupportedContent">
-      <div class="d-flex align-items-center">
-        <!-- Search form -->
-        <form class="navbar-search form-inline" id="navbar-search-main">
-          <div class="input-group input-group-merge search-bar">
 
-          </div>
-        </form>
-        <!-- / Search form -->
-      </div>
-      <!-- Navbar links -->
-      <ul class="navbar-nav align-items-center">
-
-        <li class="nav-item dropdown ms-lg-3">
-          <a class="nav-link dropdown-toggle pt-1 px-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="media d-flex align-items-center">
-              <img class="avatar rounded-circle" alt="Image placeholder" src="{{ url_for('static', filename='assets/img/team/profile-picture-3.jpg') }}">
-              <div class="media-body ms-2 text-dark align-items-center d-none d-lg-block">
-                <span class="mb-0 font-small fw-bold text-gray-900">{{ name }}</span>
-              </div>
-            </div>
-          </a>
-          <div class="dropdown-menu dashboard-dropdown dropdown-menu-end mt-2 py-1">
-            <a class="dropdown-item d-flex align-items-center" href="#">
-              <svg class="dropdown-icon text-danger me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>                
-              Выход
-            </a>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</nav>
 
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
                 <div class="d-block mb-4 mb-md-0">
@@ -184,6 +150,29 @@
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         Начать парсинг
 </button>
+                    &nbsp
+                    <button type="button" class="btn btn-block btn-danger mb-3" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">
+                        <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Очистить базу
+</button>
+
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Очистить базу данных?</h5>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Отмена</button>
+          <iframe name="dummyframe9" id="dummyframe9" style="display: none;"></iframe>
+                <form action="/clear" target="dummyframe9" id="clearform" method="post">
+        <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Modal Content -->
 <div class="modal fade" id="modalSignIn" tabindex="-1" role="dialog" aria-hidden="true">

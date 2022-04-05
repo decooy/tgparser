@@ -7,7 +7,8 @@ from flask import Flask, request
 from flask import render_template
 from telethon.sync import TelegramClient
 from telethon.tl import functions
-from telethon.tl.functions.messages import SearchGlobalRequest
+from telethon.tl.functions.channels import InviteToChannelRequest
+from telethon.tl.functions.messages import SearchGlobalRequest, AddChatUserRequest
 from telethon.tl.types import InputPeerEmpty, InputMessagesFilterEmpty
 import database
 from flask_socketio import SocketIO, emit
@@ -197,7 +198,6 @@ async def dospam(query, delay, deletebox):
             if str(e).find("invalid Peer"):
                 show_message('Ошибка', 'Похоже, эта база парсилась с другого аккаунта. Необходимо удалить и спарсить заново.', False)
                 parsing_now = False
-
                 break
             send_notification('Произошла ошибка отправки. Повтор через 5 минут.', False)
             time.sleep(300)
@@ -209,6 +209,46 @@ async def dospam(query, delay, deletebox):
 
 def spam(query, delay, deletebox):
     loop.run_until_complete(dospam(query, delay, deletebox))
+    return
+
+
+async def doinvite(link, delay, deletebox, channel):
+    global parsing_now
+    if parsing_now:
+        show_message('Парсер занят...', 'Необходимо дождаться конца предыдущей операции.', False)
+        return
+    parsing_now = True
+    db2 = database.database()
+    channel = await client.get_entity(channel)
+    socketio.emit('updateprogresstext', {'text': 'Инвайтинг в ' + str(link)})
+    users = db2.get_all_accounts()
+    sended = 0
+    for user in users:
+        try:
+            await client(InviteToChannelRequest(channel=telethon.tl.types.InputChannel(channel.id, channel.access_hash),
+                                                users=[telethon.tl.types.InputUser(int(user[0]), int(user[1]))]))
+            if deletebox:
+                db.delete_user(int(user[0]))
+                socketio.emit('total_users', {'count': db2.get_accounts_count()})
+        except Exception as e:
+            if str(e).find('privacy settings'):
+                sended += 1
+                socketio.emit('updateprogress',
+                              {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
+                time.sleep(int(delay))
+                continue
+            send_notification('Произошла ошибка инвайта. Повтор через 5 минут.', False)
+            time.sleep(300)
+            continue
+        sended += 1
+        socketio.emit('updateprogress',
+                      {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
+        time.sleep(int(delay))
+    parsing_now = False
+
+
+def invite(link, delay, deletebox, channel):
+    loop.run_until_complete(doinvite(link, delay, deletebox, channel))
     return
 
 
@@ -236,12 +276,34 @@ def spamqw():
     return 'ok'
 
 
+@app.route("/clear", methods=["POST"])
+def clear():
+    database.database().clear_base()
+    show_message('Готово.', 'База была очищена.', True)
+    return 'ok'
+
 @app.route("/invite", methods=["POST"])
 def inviteqw():
-    print(request.form.get('deletebox'))
-    print(request.form.get('invitelink'))
-    print(request.form.get('delay'))
+    db2 = database.database()
+    link = request.form.get('invitelink')
+    try:
+        channel = client.get_entity(link)
+    except Exception as e:
+        print(e)
+        show_message('Ошибка', 'Указанный адрес не является чатом/каналом', False)
+        return 'not ok'
+    if type(channel) is not telethon.tl.types.Channel:
+        show_message('Ошибка', 'Указанный адрес не является чатом/каналом', False)
+        return 'not ok'
+    deletebox = request.form.get('deletebox')
+    if type(deletebox) is str:
+        deletebox = True
+    else:
+        deletebox = False
+    delay = int(request.form.get('delay'))
+    threading.Thread(target=lambda: invite(link, delay, deletebox, link)).start()
     return 'ok'
+
 
 if __name__ == '__main__':
     client.start()

@@ -74,3 +74,9 @@ class database:
     def delete_user(self, id):
         self.cursor.execute(f"""DELETE FROM users WHERE id='{id}'""")
         self.postgre_connection.commit()
+
+    def clear_base(self):
+        self.cursor.execute(f"""DELETE FROM users""")
+        self.postgre_connection.commit()
+        self.cursor.execute(f"""DELETE FROM parsed_chats""")
+        self.postgre_connection.commit()
