@@ -119,6 +119,11 @@
                 </div>
                 <div class="btn-toolbar mb-2 mb-md-0">
 <!-- Button Modal -->
+                    <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalAddChat">
+                            <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        Добавить чат вручную
+</button>
+                    &nbsp
 <button type="button" class="btn btn-block btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalSignIn">
                             <svg class="icon icon-xs me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         Начать парсинг
@@ -144,6 +149,36 @@
       </div>
     </div>
   </div>
+</div>
+
+
+                    <div class="modal fade" id="modalAddChat" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body px-md-5">
+                <h2 class="h4 text-center">Добавить чат вручную</h2>
+                <p class="text-center mb-4">Введите адрес чата</p>
+                <iframe name="dummyframeq" id="dummyframeq" style="display: none;"></iframe>
+                <form action="/addchat" target="dummyframeq" id="adform" method="post">
+                    <!-- Form -->
+                    <div class="form-group mb-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control border-gray-300" placeholder="python" name="query" autofocus required>
+                        </div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Добавить</button>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-center align-items-center mt-4">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -656,6 +691,10 @@ $(document).ready(function(){
 
   $('#autoregform').on('submit', function (event) {
   $('#modal-form').modal('hide')
+  })
+
+  $('#adform').on('submit', function (event) {
+  $('#modalAddChat').modal('hide')
   })
 
   $('#close1').on('click', function (event) {

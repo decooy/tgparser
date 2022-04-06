@@ -37,8 +37,10 @@ class database:
         self.postgre_connection.commit()
 
     def add_parsed_chat(self, id, title, access_hash, username, participants_count):
+        if participants_count is None:
+            participants_count = -1
         self.cursor.execute(f"""INSERT INTO parsed_chats(id, title, access_hash, username, participants_count) 
-        VALUES('{id}', '{title}', '{access_hash}', '{username}', {participants_count})""")
+        VALUES('{id}', '{title}', '{access_hash}', '{username}', '{participants_count}')""")
         self.postgre_connection.commit()
 
     def get_parsed_chats(self):

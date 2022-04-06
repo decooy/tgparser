@@ -18,7 +18,7 @@ import logging
 import eventlet
 from smsactivateru import Sms, SmsTypes, SmsService, GetBalance, GetFreeSlots, GetNumber
 
-wrapper = Sms('f67Ad3edfc672f5b3e9935A195174cb6')
+wrapper = Sms('cA0945343eb0cc37e2327d14d3d38581')
 
 parsing_now = False
 
@@ -152,7 +152,8 @@ async def getentity(query):
     try:
         re = await client.get_entity(telethon.tl.types.InputPeerChannel(int(query[0]), int(query[2])))
     except Exception as e:
-        if str(e).find('pass the right types'):
+        print(e)
+        if str(e).find('pass the right types') >= 0:
             show_message('Ошибка',
                          'Похоже, эта база парсилась с другого аккаунта. Необходимо удалить и спарсить заново.', False)
             parsing_now = False
@@ -214,7 +215,13 @@ async def dospam(query, delay, deletebox):
                 db.delete_user(int(user[0]))
                 socketio.emit('total_users', {'count': db2.get_accounts_count()})
         except Exception as e:
-            if str(e).find("invalid Peer"):
+            if str(e).find('many requests') >= 0:
+                show_message('Ошибка',
+                             'Слишком много запросов телеграм. Попробуйте через несколько минут.',
+                             False)
+                parsing_now = False
+                break
+            if str(e).find("invalid Peer") >= 0:
                 show_message('Ошибка',
                              'Похоже, эта база парсилась с другого аккаунта. Необходимо удалить и спарсить заново.',
                              False)
@@ -253,7 +260,7 @@ async def doinvite(link, delay, deletebox, channel):
                 db.delete_user(int(user[0]))
                 socketio.emit('total_users', {'count': db2.get_accounts_count()})
         except Exception as e:
-            if str(e).find('privacy settings'):
+            if str(e).find('privacy settings') >= 0:
                 sended += 1
                 socketio.emit('updateprogress',
                               {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
@@ -316,17 +323,23 @@ def clear():
 
 
 def fuck_yeah(code):
+    show_message('Telegram', 'СМС получено, регистрация может занять несколько минут.', True)
     global lastphone
-    try:
-        client.start(phone=str(lastphone), code_callback=lambda: code[1])
-    except Exception as e:
-        print(e)
-        show_message('Ошибка', 'Произошла какая-то ошибка. Детали записаны в лог.', False)
+    while True:
+        try:
+            client.start(phone=str(lastphone), code_callback=lambda: code, first_name='Lorem', last_name='Ipsum')
+        except Exception as e:
+            print(e)
+            if str(e).find('wait of') >= 0:
+                time.sleep(60)
+                continue
+            show_message('Ошибка', 'Произошла какая-то ошибка. Детали записаны в лог.', False)
+            return 'ok'
+        if client.is_user_authorized():
+            socketio.emit('reboot_page')
+        else:
+            show_message('Ошибка', 'Не удалось авторизоваться.', False)
         return 'ok'
-    if client.is_user_authorized():
-        socketio.emit('reboot_page')
-    else:
-        show_message('Ошибка', 'Не удалось авторизоваться.', False)
 
 
 lastphone = 0
@@ -376,7 +389,7 @@ def reg():
         first_reg = False
         return 'ok'
     try:
-        client.start(phone=phone, code_callback=lambda: code)
+        client.start(phone=phone, code_callback=lambda: code, first_name='Lorem', last_name='Ipsum')
     except:
         show_message('Ошибка', 'Произошла какая-то ошибка. Детали записаны в лог.', False)
         return 'ok'
@@ -386,6 +399,32 @@ def reg():
     else:
         show_message('Ошибка', 'Не удалось авторизоваться.', False)
         first_reg = True
+    return 'ok'
+
+
+@app.route("/addchat", methods=["POST"])
+def adchat():
+    db2 = database.database()
+    if not client.is_user_authorized():
+        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
+        return 'not ok'
+    global parsing_now
+    if parsing_now:
+        show_message('Ошибка.', 'Необходимо дождаться окончания предыдущей операции.', True)
+        return 'not ok'
+    parsing_now = True
+    query = request.form.get('query')
+    chat = client.get_entity(query)
+    if type(chat) is not telethon.tl.types.Channel:
+        show_message('Ошибка.', 'Адрес не является чатом.', True)
+        parsing_now = False
+        return 'not ok'
+    db2.add_parsed_chat(chat.id, chat.title, chat.access_hash, chat.username, chat.participants_count)
+    title = chat.title
+    socketio.emit('parsed_chat', {'id': chat.id, 'title': title, 'access_hash': chat.access_hash,
+                                      'username': chat.username, 'participants_count': chat.participants_count})
+    socketio.emit('total_chats', {'count': db2.get_chats_count()})
+    parsing_now = False
     return 'ok'
 
 

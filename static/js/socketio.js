@@ -19,9 +19,9 @@ socket.on('parsed_chat', function(msg) {
             '</td>'
             + '</tr>');
             try {
-                        $(norec).hide()
+                $(norec).hide()
             } catch (e) {
-            var a = e;
+                var a = e;
             }
 });
 
