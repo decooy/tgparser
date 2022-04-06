@@ -357,18 +357,33 @@ def areg():
         return 'false'
     lastphone = activation.phone_number
     client.send_code_request(phone=str(activation.phone_number), force_sms=True)
-    activation.was_sent()
-    activation.wait_code(callback=fuck_yeah, wrapper=wrapper)
+    try:
+        activation.was_sent()
+        activation.wait_code(callback=fuck_yeah, wrapper=wrapper)
+    except Exception as e:
+        show_message('SMS-REG', e[0], False)
     return 'ok'
 
 
 first_reg = True
 
 
+async def logoutw():
+    try:
+        await client.log_out()
+    except:
+        pass
+    return
+
+
+def logout_loop():
+    loop.run_until_complete(logoutw())
+
+
 @app.route("/logout", methods=["POST"])
 def logout():
     try:
-        client.log_out()
+        threading.Thread(target=logout_loop).start()
     except:
         pass
     socketio.emit('reboot_page')
@@ -378,6 +393,7 @@ def logout():
 @app.route("/reg", methods=["POST"])
 def reg():
     global first_reg
+    client.connect()
     phone = request.form.get('phone')
     code = request.form.get('code')
     if first_reg:
