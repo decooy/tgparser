@@ -16,6 +16,9 @@ import nest_asyncio
 import gevent.monkey
 import logging
 import eventlet
+from smsactivateru import Sms, SmsTypes, SmsService, GetBalance, GetFreeSlots, GetNumber
+
+wrapper = Sms('f67Ad3edfc672f5b3e9935A195174cb6')
 
 parsing_now = False
 
@@ -23,7 +26,6 @@ nest_asyncio.apply()
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
-
 
 app = Flask(__name__)
 app.secret_key = 'parse'
@@ -57,9 +59,14 @@ def spmer():
 def home():
     db2 = database.database()
     try:
-        name = loop.run_until_complete(getme()).first_name
+        user = loop.run_until_complete(getme())
+        name = user.first_name
+        username = user.username
+        phone = user.phone
     except:
-        name = 'ОШИБКА АККАУНТА'
+        name = 'Аккаунт отсутствует'
+        username = ''
+        phone = ''
     _data = db2.get_parsed_chats()
     data = []
     for i in _data:
@@ -69,16 +76,24 @@ def home():
         data.append([i[0], title, i[2], i[3], i[4]])
     accounts = db2.get_accounts_count()
     chats = db2.get_chats_count()
-    me = loop.run_until_complete(getme())
-    me = [me.first_name, ('@' + str(me.username)).replace('@None', ''), '+' + str(me.phone)]
+    if name == 'Аккаунт отсутствует':
+        me = [name, username, phone]
+    else:
+        me = [name, ('@' + str(username)).replace('@None', ''), '+' + str(phone)]
     return render_template('index.html', name=name, data=data, count=accounts, chatcount=chats, me=me)
 
 
 async def getme():
-    return await client.get_me()
+    if await client.is_user_authorized():
+        return await client.get_me()
+    else:
+        return None
 
 
 async def search_chats(query):
+    if not await client.is_user_authorized():
+        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
+        return
     global parsing_now
     if parsing_now:
         show_message('Парсер занят...', 'Необходимо дождаться конца предыдущей операции.', False)
@@ -124,6 +139,9 @@ def search():
 
 
 async def getentity(query):
+    if not await client.is_user_authorized():
+        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
+        return
     global parsing_now
     if parsing_now:
         show_message('Парсер занят...', 'Необходимо дождаться конца предыдущей операции.', False)
@@ -150,8 +168,9 @@ async def getentity(query):
             socketio.emit('total_users', {'count': db2.get_accounts_count()})
         show_message('Готово.', 'Парсер окончил работу. Собрано аккаунтов: ' + str(users), True)
     except:
-        show_message('Ошибка.', 'Парсер окончил работу с ошибкой флуда (FloodWaitError). Повторите попытку через пару мин.'
-                                'Удалось собрать аккаунтов: ' + str(users), False)
+        show_message('Ошибка.',
+                     'Парсер окончил работу с ошибкой флуда (FloodWaitError). Повторите попытку через пару мин.'
+                     'Удалось собрать аккаунтов: ' + str(users), False)
     parsing_now = False
 
     return re
@@ -196,13 +215,16 @@ async def dospam(query, delay, deletebox):
                 socketio.emit('total_users', {'count': db2.get_accounts_count()})
         except Exception as e:
             if str(e).find("invalid Peer"):
-                show_message('Ошибка', 'Похоже, эта база парсилась с другого аккаунта. Необходимо удалить и спарсить заново.', False)
+                show_message('Ошибка',
+                             'Похоже, эта база парсилась с другого аккаунта. Необходимо удалить и спарсить заново.',
+                             False)
                 parsing_now = False
                 break
             send_notification('Произошла ошибка отправки. Повтор через 5 минут.', False)
             time.sleep(300)
         sended += 1
-        socketio.emit('updateprogress', {'percent': int(sended/len(users)*100), 'sended': sended, 'total': len(users)})
+        socketio.emit('updateprogress',
+                      {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
         time.sleep(int(delay))
     parsing_now = False
 
@@ -261,6 +283,9 @@ def send_notification(text, positive):
 
 @app.route("/spam", methods=["POST"])
 def spamqw():
+    if not client.is_user_authorized():
+        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
+        return 'not ok'
     db2 = database.database()
     query = request.form.get('spamtext')
     delay = request.form.get('delay')
@@ -278,12 +303,97 @@ def spamqw():
 
 @app.route("/clear", methods=["POST"])
 def clear():
+    global parsing_now
+    if parsing_now:
+        show_message('Ошибка.', 'Необходимо дождаться окончания предыдущей операции.', True)
+        return 'not ok'
+    parsing_now = True
     database.database().clear_base()
     show_message('Готово.', 'База была очищена.', True)
+    parsing_now = False
+    socketio.emit('clear_all')
     return 'ok'
+
+
+def fuck_yeah(code):
+    global lastphone
+    try:
+        client.start(phone=str(lastphone), code_callback=lambda: code[1])
+    except Exception as e:
+        print(e)
+        show_message('Ошибка', 'Произошла какая-то ошибка. Детали записаны в лог.', False)
+        return 'ok'
+    if client.is_user_authorized():
+        socketio.emit('reboot_page')
+    else:
+        show_message('Ошибка', 'Не удалось авторизоваться.', False)
+
+
+lastphone = 0
+
+
+@app.route("/autoreg", methods=["POST"])
+def areg():
+    global lastphone
+    show_message('Ожидание...:', 'Регистрация аккаунта...', True)
+    try:
+        activation = GetNumber(
+            service=SmsService().Telegram,
+            country=SmsTypes.Country.ID,
+            operator=SmsTypes.Operator.any
+        ).request(wrapper)
+    except Exception as e:
+        show_message('SMS-ACTIVATE:', e.args[0], False)
+        return 'false'
+    lastphone = activation.phone_number
+    client.send_code_request(phone=str(activation.phone_number), force_sms=True)
+    activation.was_sent()
+    activation.wait_code(callback=fuck_yeah, wrapper=wrapper)
+    return 'ok'
+
+
+first_reg = True
+
+
+@app.route("/logout", methods=["POST"])
+def logout():
+    try:
+        client.log_out()
+    except:
+        pass
+    socketio.emit('reboot_page')
+    return 'ok'
+
+
+@app.route("/reg", methods=["POST"])
+def reg():
+    global first_reg
+    phone = request.form.get('phone')
+    code = request.form.get('code')
+    if first_reg:
+        client.send_code_request(phone=phone, force_sms=False)
+        socketio.emit('show_code')
+        first_reg = False
+        return 'ok'
+    try:
+        client.start(phone=phone, code_callback=lambda: code)
+    except:
+        show_message('Ошибка', 'Произошла какая-то ошибка. Детали записаны в лог.', False)
+        return 'ok'
+    if client.is_user_authorized():
+        socketio.emit('reboot_page')
+        first_reg = True
+    else:
+        show_message('Ошибка', 'Не удалось авторизоваться.', False)
+        first_reg = True
+    return 'ok'
+
 
 @app.route("/invite", methods=["POST"])
 def inviteqw():
+    if not client.is_user_authorized():
+        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
+        return 'not ok'
     db2 = database.database()
     link = request.form.get('invitelink')
     try:
@@ -306,5 +416,8 @@ def inviteqw():
 
 
 if __name__ == '__main__':
-    client.start()
+    client.connect()
+    if client.is_user_authorized():
+        client.start()
+    # client.start()
     socketio.run(app, host='0.0.0.0', port=8888)

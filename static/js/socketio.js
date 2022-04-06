@@ -40,6 +40,30 @@ var elem = document.getElementById('swal2-html-container')
 elem.innerHTML = 'Чатов найдено: ' + msg.count;
 });
 
+socket.on('show_code', function(msg) {
+var elem = document.getElementById('smsgroup')
+elem.hidden=false;
+var elem2 = document.getElementById('smsbutton')
+elem2.innerHTML = 'Войти'
+});
+
+socket.on('reboot_page', function(msg) {
+   window.location.reload();
+});
+
+socket.on('clear_all', function() {
+var elem = document.getElementById('chatcount')
+var elem2 = document.getElementById('chatcount2')
+var elem3 = document.getElementById('usercount')
+var elem4 = document.getElementById('usercount2')
+elem.innerHTML = 0;
+elem2.innerHTML = 0;
+elem3.innerHTML = 0;
+elem4.innerHTML = 0;
+$('#tabledbody').empty()
+});
+
+
 socket.on('total_chats', function(msg) {
 var elem = document.getElementById('chatcount')
 var elem2 = document.getElementById('chatcount2')
