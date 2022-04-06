@@ -290,9 +290,6 @@ def send_notification(text, positive):
 
 @app.route("/spam", methods=["POST"])
 def spamqw():
-    if not client.is_user_authorized():
-        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
-        return 'not ok'
     db2 = database.database()
     query = request.form.get('spamtext')
     delay = request.form.get('delay')
@@ -405,9 +402,6 @@ def reg():
 @app.route("/addchat", methods=["POST"])
 def adchat():
     db2 = database.database()
-    if not client.is_user_authorized():
-        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
-        return 'not ok'
     global parsing_now
     if parsing_now:
         show_message('Ошибка.', 'Необходимо дождаться окончания предыдущей операции.', True)
@@ -430,9 +424,6 @@ def adchat():
 
 @app.route("/invite", methods=["POST"])
 def inviteqw():
-    if not client.is_user_authorized():
-        show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
-        return 'not ok'
     db2 = database.database()
     link = request.form.get('invitelink')
     try:
