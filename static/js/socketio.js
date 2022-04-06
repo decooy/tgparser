@@ -12,7 +12,10 @@ socket.on('parsed_chat', function(msg) {
             'Действие' +
             '</button>' +
             '<ul class="dropdown-menu py-0" aria-labelledby="dropdownMenuOffset">' +
-            '<li><button class="dropdown-item rounded-top">Спарсить участников</button></li>' +
+            '<iframe name="dummyframe3" id="dummyframe3" style="display: none;"></iframe>' +
+            '<form action="/parse" target="dummyframe3" id="parseform" method="post"><input value="' + msg.id + '" hidden name="id">' +
+            '<li><button type="submit" class="dropdown-item rounded-top">Спарсить участников</button></li>' +
+            '</form>' +
             '<li><button data-bs-toggle="modal" data-bs-target="#deleteModal" data-val="' + msg.id +'" data-desc="' + msg.title + '" class="dropdown-item rounded-bottom">Удалить</button></li>' +
             '</ul>' +
             '</div>' +

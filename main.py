@@ -227,6 +227,7 @@ async def dospam(query, delay, deletebox):
                              False)
                 parsing_now = False
                 break
+            print(e)
             send_notification('Произошла ошибка отправки. Повтор через 5 минут.', False)
             time.sleep(300)
         sended += 1
@@ -266,6 +267,7 @@ async def doinvite(link, delay, deletebox, channel):
                               {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
                 time.sleep(int(delay))
                 continue
+            print(e)
             send_notification('Произошла ошибка инвайта. Повтор через 5 минут.', False)
             time.sleep(300)
             continue
@@ -397,7 +399,11 @@ def reg():
     phone = request.form.get('phone')
     code = request.form.get('code')
     if first_reg:
-        client.send_code_request(phone=phone, force_sms=False)
+        try:
+            client.send_code_request(phone=phone, force_sms=False)
+        except telethon.errors.FloodWaitError:
+            show_message('Anti fraud', 'Необходимо подождать перед отправкой смс.', False)
+            return 'ok'
         socketio.emit('show_code')
         first_reg = False
         return 'ok'
