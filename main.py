@@ -5,6 +5,7 @@ import flask
 import telethon.tl.types
 from flask import Flask, request
 from flask import render_template
+from telethon import events
 from telethon.sync import TelegramClient
 from telethon.tl import functions
 from telethon.tl.functions.channels import InviteToChannelRequest
@@ -242,6 +243,11 @@ def spam(query, delay, deletebox):
     return
 
 
+@client.on(events.NewMessage(incoming=True))
+async def handlerw(event):
+    print(event)
+
+
 async def doinvite(link, delay, deletebox, channel):
     global parsing_now
     if parsing_now:
@@ -358,12 +364,16 @@ def areg():
         show_message('SMS-ACTIVATE:', e.args[0], False)
         return 'false'
     lastphone = activation.phone_number
-    client.send_code_request(phone=str(activation.phone_number), force_sms=True)
+    try:
+        client.send_code_request(phone=str(activation.phone_number), force_sms=True)
+    except telethon.errors.PhoneNumberBannedError:
+        show_message('Telegram', 'Этот номер заблокирован телеграмом для регистрации. Отмена регистрации.', 'False')
+        return 'ok'
     try:
         activation.was_sent()
         activation.wait_code(callback=fuck_yeah, wrapper=wrapper)
     except Exception as e:
-        show_message('SMS-REG', e[0], False)
+        show_message('SMS-REG', e, False)
     return 'ok'
 
 
@@ -471,5 +481,4 @@ if __name__ == '__main__':
     client.connect()
     if client.is_user_authorized():
         client.start()
-    # client.start()
     socketio.run(app, host='0.0.0.0', port=8888)
