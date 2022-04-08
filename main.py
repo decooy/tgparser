@@ -320,6 +320,16 @@ def send_notification(text, positive):
         socketio.emit('sendnotyferror', {'text': text})
 
 
+@app.route("/stop", methods=["POST"])
+def stp():
+    global needstop
+    if parsing_now:
+        needstop = True
+    else:
+        show_message('Ошибка', 'Не запущено никаких операций', False)
+    return 'ok'
+
+
 @app.route("/spam", methods=["POST"])
 def spamqw():
     db2 = database.database()
