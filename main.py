@@ -20,7 +20,7 @@ import eventlet
 from smsactivateru import Sms, SmsTypes, SmsService, GetBalance, GetFreeSlots, GetNumber
 
 wrapper = Sms('cA0945343eb0cc37e2327d14d3d38581')
-
+needstop = False
 parsing_now = False
 
 nest_asyncio.apply()
@@ -92,6 +92,7 @@ async def getme():
 
 
 async def search_chats(query):
+    global needstop
     if not await client.is_user_authorized():
         show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
         return
@@ -108,6 +109,10 @@ async def search_chats(query):
     ))
     chats = 0
     for chat in result.chats:
+        if needstop:
+            needstop = False
+            show_message('Готово.', 'Парсинг остановлен', True)
+            break
         if chat.megagroup or chat.gigagroup:
             chats += 1
             db2.add_parsed_chat(chat.id, chat.title, chat.access_hash, chat.username, chat.participants_count)
@@ -140,6 +145,7 @@ def search():
 
 
 async def getentity(query):
+    global needstop
     if not await client.is_user_authorized():
         show_message('Отсутствует аккаунт.', 'Необходимо добавить активный аккаунт.', False)
         return
@@ -163,6 +169,9 @@ async def getentity(query):
     result = client.iter_participants(re, aggressive=True)
     try:
         async for r in result:
+            if needstop:
+                needstop = False
+                break
             time.sleep(0.05)
             users += 1
             db2.add_parsed_user(r, query)
@@ -192,6 +201,7 @@ def parse():
 
 
 async def dospam(query, delay, deletebox):
+    global needstop
     global parsing_now
     if parsing_now:
         show_message('Парсер занят...', 'Необходимо дождаться конца предыдущей операции.', False)
@@ -208,6 +218,10 @@ async def dospam(query, delay, deletebox):
     sended = 1
     for user in users:
         try:
+            if needstop:
+                show_message('Готово.', 'Спаммер остановлен', True)
+                needstop = False
+                break
             entity = telethon.tl.types.InputPeerUser(int(user[0]), int(user[1]))
             client.action(entity=entity, action='typing')
             time.sleep(0.5)
@@ -230,7 +244,12 @@ async def dospam(query, delay, deletebox):
                 break
             print(e)
             send_notification('Произошла ошибка отправки. Повтор через 5 минут.', False)
-            time.sleep(300)
+            for i in range(0, 300):
+                time.sleep(1)
+                if needstop:
+                    show_message('Готово.', 'Спаммер остановлен', True)
+                    needstop = False
+                    return
         sended += 1
         socketio.emit('updateprogress',
                       {'percent': int(sended / len(users) * 100), 'sended': sended, 'total': len(users)})
@@ -249,6 +268,7 @@ async def handlerw(event):
 
 
 async def doinvite(link, delay, deletebox, channel):
+    global needstop
     global parsing_now
     if parsing_now:
         show_message('Парсер занят...', 'Необходимо дождаться конца предыдущей операции.', False)
@@ -261,6 +281,10 @@ async def doinvite(link, delay, deletebox, channel):
     sended = 0
     for user in users:
         try:
+            if needstop:
+                show_message('Готово.', 'Инвайтинг остановлен', True)
+                needstop = False
+                break
             await client(InviteToChannelRequest(channel=telethon.tl.types.InputChannel(channel.id, channel.access_hash),
                                                 users=[telethon.tl.types.InputUser(int(user[0]), int(user[1]))]))
             if deletebox:
